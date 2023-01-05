@@ -1,0 +1,37 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+logger_island_enable = True
+logger_binary_lib = "Source"
+logger_clean_pack_list = []
+
+if 'SNS_ISLAND_INCLUDE_LOGGER' in env:
+  logger_island_enable = True
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_logger_register",
+               clean_pack_list = logger_clean_pack_list,
+               binary_lib = logger_binary_lib,
+               flavor = ["src"],
+               ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               add_island_files = logger_island_enable,
+               cflags = ["-DCFG_MSM_845_LOGGER"])

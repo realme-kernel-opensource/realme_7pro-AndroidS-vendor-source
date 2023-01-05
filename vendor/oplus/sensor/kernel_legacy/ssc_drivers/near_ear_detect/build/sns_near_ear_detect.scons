@@ -1,0 +1,38 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+near_ear_detect_island_enable = True
+near_ear_detect_binary_lib = "Source"
+near_ear_detect_clean_pack_list = []
+
+if 'SNS_ISLAND_INCLUDE_NEAR_EAR_DETECT' in env:
+  near_ear_detect_island_enable = True
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_near_ear_detect_register",
+               core_public_api = ['SYSTEMDRIVERS'],
+               clean_pack_list = near_ear_detect_clean_pack_list,
+               binary_lib = near_ear_detect_binary_lib,
+	       ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               flavor = ["src","near_ear_detect_algo"],
+               add_island_files = near_ear_detect_island_enable,
+               cflags = ["-DCFG_MSM_845_NEAR_EAR_DETECT"])

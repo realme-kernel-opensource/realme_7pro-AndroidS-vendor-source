@@ -1,0 +1,34 @@
+#===============================================================================
+#
+# ELEVATOR DETECT SENSOR
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+elevator_detect_island_enable = True
+elevator_detect_binary_lib = "Source"
+elevator_detect_clean_pack_list = []
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_elevator_detect_register",
+               clean_pack_list = elevator_detect_clean_pack_list,
+               binary_lib = elevator_detect_binary_lib,
+	       ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               flavor = ["src","elevator_detect_algo"],
+               add_island_files = elevator_detect_island_enable,
+               cflags = ["-DCFG_MSM_845_ELEVATOR_DETECT"])

@@ -1,0 +1,35 @@
+#************************************************************************************
+# Copyright (C), 2008-2018, OPPO Mobile Comm Corp., Ltd
+# OPLUS_FEATURE_SENSOR
+# File: step_counter.cpp
+#
+# Description:
+#      Definitions for devinfo sensor.
+#
+# Version: 1.0
+# Date created: 2018/03/09,20:27
+#
+# --------------------------- Revision History: ------------------------------------
+# <version>     <date>      <author>        <desc>
+#**************************************************************************************/
+Import('env')
+import inspect
+if 'SENSORS_DD_DEV_FLAG' not in env:
+  devinfo_sns_cleanpack= []
+  binlib=False
+else:
+  devinfo_sns_cleanpack=['*.c','*.h']
+  binlib=True
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+
+if ('SSC_TARGET_HEXAGON_MDSP' in env['CPPDEFINES']):
+  Return()
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               core_public_api = [],
+               clean_pack_list = devinfo_sns_cleanpack,
+               binary_lib=binlib,
+               register_func_name  = "sns_register_devinfo_sensor")

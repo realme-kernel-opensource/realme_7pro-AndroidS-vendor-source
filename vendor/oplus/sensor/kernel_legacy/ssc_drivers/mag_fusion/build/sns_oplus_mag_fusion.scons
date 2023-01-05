@@ -1,0 +1,41 @@
+#===============================================================================
+#
+# mag_fusion
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by OnePlus Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - OnePlus Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+
+mag_fusion_island_enable = False
+
+sns_akm_mag_cal_lib = env.AddBinaryLibrary(env['SSC_BUILD_TAGS'],
+                       "${BUILDPATH}/algo/akm_mag_fusion/libAKM",
+                       ["${BUILDPATH}/algo/akm_mag_fusion/libAKM.lib"])
+
+if 'SNS_ISLAND_INCLUDE_MAG_FUSION' in env:
+  mag_fusion_island_enable = True
+  env.Append( CPPDEFINES = ['MAG_FUSION_USE_ISLAND'] )
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               clean_pack_list = ['*.c','*.h','*.proto'],
+               flavor = ["src","algo"],
+               ssc_protected_api = ['SNS_MATH_UTIL','SNS_INTERNAL_INCLUDES'],
+               register_func_name = "sns_mag_fusion_register",
+               binary_lib = False,
+               cflags = ['-Wno-sign-compare'],
+               add_island_files = mag_fusion_island_enable)

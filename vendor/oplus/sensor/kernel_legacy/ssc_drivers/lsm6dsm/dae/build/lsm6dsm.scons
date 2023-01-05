@@ -1,0 +1,22 @@
+#===============================================================================
+#
+# @file lsm6dsm.scons
+#
+# Copyright (c) 2018, STMicroelectronics.
+# All rights reserved.
+#
+#  Copyright (c) 2018 Qualcomm Technologies, Inc.
+#  All Rights Reserved.
+#  Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#===============================================================================
+Import('env')
+import inspect
+
+if 'USES_DAE_DRIVERS_BUILDER' in env:
+  vtable    = ["lsm6dsm_fifo_hal_table", 
+               "lsm6dsm_temperature_hal_table"]
+  if 'LSM6DSM_ENABLE_DUAL_SENSOR' in env:
+    vtable += ["lsm6dsm_fifo_hal_table2", 
+               "lsm6dsm_temperature_hal_table2"]
+  env.AddDAEDriver(inspect.getfile(inspect.currentframe()), vtable)

@@ -1,0 +1,30 @@
+Import('env')
+import inspect
+
+if 'SSC_TARGET_HEXAGON_MDSP' in env['CPPDEFINES']:
+  Return()
+
+CBSP_API = [
+   'MPROC',
+   'DAL',
+   'DEBUGTOOLS',
+   'KERNEL',
+   'SYSTEMDRIVERS',
+]
+
+alsps_island_enable = False
+
+if 'SNS_ISLAND_INCLUDE_OPLUS_ALSPS' in env:
+  alsps_island_enable = True
+if 'SNS_GET_PARAMETER_FROM_SMEM' in env:
+  env.Append( CPPDEFINES = ['ALSPS_GET_PARAMETER_FROM_SMEM'])
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  if 'SSC_TARGET_HEXAGON' in env['CPPDEFINES']:
+	env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+			flavor = ["alsps","drivers","platform","utils","slit_prox_algo"],
+			core_public_api = CBSP_API,
+			ssc_protected_api = ['SNS_FRAMEWORK', 'SNS_INTERNAL_INCLUDES'],
+			register_func_name = "sns_register_alsps",
+			binary_lib = False,
+			add_island_files = alsps_island_enable)

@@ -1,0 +1,38 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+free_fall_island_enable = True
+free_fall_binary_lib = "Source"
+free_fall_clean_pack_list = []
+
+if 'SNS_ISLAND_INCLUDE_FREE_FALL' in env:
+  free_fall_island_enable = True
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_free_fall_register",
+               core_public_api = ['SYSTEMDRIVERS'],
+               clean_pack_list = free_fall_clean_pack_list,
+	       ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               binary_lib = free_fall_binary_lib,
+               flavor = ["src","free_fall_algo"],
+               add_island_files = free_fall_island_enable,
+               cflags = ["-DCFG_MSM_845_FREE_FALL"])

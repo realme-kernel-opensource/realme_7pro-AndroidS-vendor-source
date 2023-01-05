@@ -1,0 +1,59 @@
+#===============================================================================
+#
+# BMI26X sensor implementation
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017-2020 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#===============================================================================
+Import('env')
+import os, inspect
+
+if ('SSC_TARGET_HEXAGON_MDSP' in env['CPPDEFINES']):
+  Return()
+
+bmi26x_island_enable = False
+
+if 'SNS_GET_PARAMETER_FROM_SMEM' in env:
+  env.Append( CPPDEFINES = ['BMI26X_GET_PARAMETER_FROM_SMEM'] )
+CBSP_API = [
+   'SYSTEMDRIVERS',
+]
+
+if 'SNS_ISLAND_INCLUDE_BMI26X' in env:
+  bmi26x_island_enable = True
+
+if 'SNS_DISABLE_REGISTRY' in env:
+  env.Append( CPPDEFINES = ['BMI26X_ENABLE_REGISTRY=0'] )
+else:
+  env.Append( CPPDEFINES = ['BMI26X_ENABLE_REGISTRY=1'] )
+
+if 'BMI26X_ENABLE_DUAL_SENSOR' in env:
+  env.Append( CPPDEFINES = ['BMI26X_ENABLE_DUAL_SENSOR'] )
+  num_copy = 2
+else:
+  num_copy = 1
+
+if 'SSC_INCLUDE_SENS_VEND_LIBS' in env and ('bmi26x' in env['SSC_INCLUDE_SENS_VEND_LIBS']):
+  # HY11 builds - ship as source
+  clean_pack_list = []
+else:
+  # Delete the NPOR driver from pack builds
+  clean_pack_list = ['*']
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  if ('SSC_TARGET_HEXAGON' in env['CPPDEFINES']):
+    env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_register_bmi26x", 
+               core_public_api = CBSP_API,
+               binary_lib = False,
+               clean_pack_list = clean_pack_list,
+               cflags = ['-Wno-sign-compare','-Wno-enum-compare'],
+               add_island_files = bmi26x_island_enable,
+               registration_cnt = num_copy,
+               diag_ssid = "MSG_SSID_SNS_SENSOR_EXT")
+

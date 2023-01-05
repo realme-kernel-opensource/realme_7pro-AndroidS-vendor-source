@@ -1,0 +1,43 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+double_tap_island_enable = True
+double_tap_binary_lib = "Source"
+double_tap_clean_pack_list = []
+CBSP_API = [
+   'MPROC',
+   'DAL',
+   'DEBUGTOOLS',
+   'KERNEL',
+   'SYSTEMDRIVERS'
+]
+if 'SNS_ISLAND_INCLUDE_DOUBLE_TAP' in env:
+  double_tap_island_enable = True
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_double_tap_register",
+               core_public_api = CBSP_API,
+	       ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               clean_pack_list = double_tap_clean_pack_list,
+               binary_lib = double_tap_binary_lib,
+               flavor = ["src","double_tap_algo"],
+               add_island_files = double_tap_island_enable)

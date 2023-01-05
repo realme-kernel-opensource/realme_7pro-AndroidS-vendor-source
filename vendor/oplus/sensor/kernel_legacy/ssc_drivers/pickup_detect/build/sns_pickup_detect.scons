@@ -1,0 +1,38 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+pickup_detect_island_enable = True
+pickup_detect_binary_lib = "Source"
+pickup_detect_clean_pack_list = []
+
+if 'SNS_ISLAND_INCLUDE_PICKUP_DETECT' in env:
+  pickup_detect_island_enable = True
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_pickup_detect_register",
+               core_public_api = ['SYSTEMDRIVERS'],
+               clean_pack_list = pickup_detect_clean_pack_list,
+               binary_lib = pickup_detect_binary_lib,
+	       ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               flavor = ["src","pickup_detect_algo"],
+               add_island_files = pickup_detect_island_enable,
+               cflags = ["-DCFG_MSM_845_PICKUP_DETECT"])

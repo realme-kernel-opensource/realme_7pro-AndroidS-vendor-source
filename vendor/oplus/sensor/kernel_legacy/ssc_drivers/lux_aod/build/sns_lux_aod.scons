@@ -1,0 +1,44 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+lux_aod_island_enable = True
+lux_aod_binary_lib = "Source"
+lux_aod_clean_pack_list = []
+CBSP_API = [
+   'MPROC',
+   'DAL',
+   'DEBUGTOOLS',
+   'KERNEL',
+   'SYSTEMDRIVERS',
+]
+if 'SNS_ISLAND_INCLUDE_LUX_AOD' in env:
+  lux_aod_island_enable = True
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_lux_aod_register",
+               core_public_api = CBSP_API,
+	       ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               clean_pack_list = lux_aod_clean_pack_list,
+               binary_lib = lux_aod_binary_lib,
+               flavor = ["src","lux_aod_algo"],
+               add_island_files = lux_aod_island_enable,
+               cflags = ["-DCFG_MSM_845_LUX_AOD"])

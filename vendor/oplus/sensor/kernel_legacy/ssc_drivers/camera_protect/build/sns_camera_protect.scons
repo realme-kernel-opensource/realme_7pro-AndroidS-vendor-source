@@ -1,0 +1,35 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+camera_protect_island_enable = True
+camera_protect_binary_lib = "Source"
+camera_protect_clean_pack_list = []
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_camera_protect_register",
+               core_public_api = ['SYSTEMDRIVERS'],
+               ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               clean_pack_list = camera_protect_clean_pack_list,
+               binary_lib = camera_protect_binary_lib,
+               flavor = ["src","camera_protect_algo"],
+               add_island_files = camera_protect_island_enable,
+               cflags = ["-DCFG_MSM_845_CAMERA_PROTECT"])

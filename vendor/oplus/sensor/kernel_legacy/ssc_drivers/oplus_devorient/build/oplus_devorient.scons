@@ -1,0 +1,47 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+oplus_devorient_island_enable = True
+oplus_devorient_binary_lib = "Source"
+oplus_devorient_clean_pack_list = []
+
+CBSP_API = [
+   'MPROC',
+   'DAL',
+   'DEBUGTOOLS',
+   'SERVICES',
+   'KERNEL',
+   'SYSTEMDRIVERS',
+]
+
+if 'OPLUS_FEATURE_DEVORIENT_USE_AMD' in env:
+  env.Append(CPPDEFINES = ['OPLUS_DEVORIENT_USE_AMD'] )
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "devorient_register",
+               ssc_protected_api = ['SNS_INTERNAL_INCLUDES','SNS_FRAMEWORK'],
+               core_public_api = CBSP_API,
+               clean_pack_list = oplus_devorient_clean_pack_list,
+               binary_lib = oplus_devorient_binary_lib,
+               flavor = ["src","oplus_devorient_algo"],
+               add_island_files = oplus_devorient_island_enable,
+               cflags = ["-DCFG_QCOM_SEE_DEVORIENT"])

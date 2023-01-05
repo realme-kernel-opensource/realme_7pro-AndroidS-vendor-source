@@ -1,0 +1,24 @@
+#===============================================================================
+#
+# Oppo sensors libraries
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2016-2019 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#  $Id: //components/rel/ssc.slpi/5.0/sensors/build/sensors.scons#3 $
+#  $DateTime: 2020/04/10$
+#  $Change: 18893650 $
+#
+#===============================================================================
+
+Import('env')
+#-------------------------------------------------------------------------------
+# Scan subdirectories to find more /build folders
+#-------------------------------------------------------------------------------
+env.LoadSoftwareUnits()

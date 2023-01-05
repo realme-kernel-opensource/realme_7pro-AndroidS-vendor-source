@@ -1,0 +1,35 @@
+#===============================================================================
+#
+# OEM1
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#
+#===============================================================================
+Import('env')
+import inspect
+
+#-------------------------------------------------------------------------------
+# Adds self
+#-------------------------------------------------------------------------------
+fp_display_island_enable = True
+fp_display_binary_lib = "Source"
+fp_display_clean_pack_list = []
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               register_func_name = "sns_fp_display_register",
+               core_public_api = ['SYSTEMDRIVERS'],
+               clean_pack_list = fp_display_clean_pack_list,
+	       ssc_protected_api = ['SNS_INTERNAL_INCLUDES'],
+               binary_lib = fp_display_binary_lib,
+               flavor = ["src","fp_display_algo"],
+               add_island_files = fp_display_island_enable,
+               cflags = ["-DCFG_MSM_845_FP_DISPLAY"])

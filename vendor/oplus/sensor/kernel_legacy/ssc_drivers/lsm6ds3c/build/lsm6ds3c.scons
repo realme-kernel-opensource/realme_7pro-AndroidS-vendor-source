@@ -1,0 +1,53 @@
+#===============================================================================
+#
+# LSM6DSM sensor implementation
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017-2018 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#===============================================================================
+Import('env')
+import os, inspect
+
+if ('SSC_TARGET_HEXAGON_MDSP' in env['CPPDEFINES']):
+  Return()
+
+lsm6ds3c_island_enable = False
+if 'SNS_GET_PARAMETER_FROM_SMEM' in env:
+	env.Append( CPPDEFINES = ['LSM6DS3C_GET_PARAMETER_FROM_SMEM'] )
+
+if 'SNS_ISLAND_INCLUDE_LSM6DS3C' in env:
+  lsm6ds3c_island_enable = True
+
+if 'SNS_DISABLE_REGISTRY' in env:
+  env.Append( CPPDEFINES = ['LSM6DS3C_ENABLE_REGISTRY=0'] )
+else:
+  env.Append( CPPDEFINES = ['LSM6DS3C_ENABLE_REGISTRY=1'] )
+
+if 'LSM6DS3C_ENABLE_DUAL_SENSOR' in env:
+  env.Append( CPPDEFINES = ['LSM6DS3C_ENABLE_DUAL_SENSOR'] )
+  num_copy = 2
+else:
+  num_copy = 1
+
+CBSP_API = [
+   'DAL',
+   'SYSTEMDRIVERS',
+   'SERVICES',
+   'DEBUGTOOLS',
+   'KERNEL',
+]
+
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  if ('SSC_TARGET_HEXAGON' in env['CPPDEFINES']):
+    env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+                 core_public_api = CBSP_API,
+                 flavor = ["hexagon"],
+                 register_func_name = "sns_register_lsm6ds3c",
+                 binary_lib = False,
+                 add_island_files = lsm6ds3c_island_enable,
+                 registration_cnt = num_copy)

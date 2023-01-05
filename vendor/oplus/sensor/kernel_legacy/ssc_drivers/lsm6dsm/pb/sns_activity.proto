@@ -1,0 +1,72 @@
+// @file sns_activity.proto
+//
+// Defines standard message types for Activity Sensor. All physical Sensor
+// drivers that support Activity Sensor are required to support the
+// event messages as defined in this file.
+//
+// Copyright (c) 2017 STMicroelectronics, Inc.
+// All Rights Reserved.
+// Confidential and Proprietary - STMicroelectronics, Inc.
+
+syntax = "proto2";
+import "nanopb.proto";
+import "sns_std_sensor.proto";
+import "sns_physical_sensor_test.proto";
+
+// Attribute requirements:
+// The Activity Sensor publishes:
+// 1. SNS_STD_SENSOR_ATTRID_TYPE attribute value as "activity".
+// 2. SNS_STD_SENSOR_ATTRID_RESOLUTIONS, SNS_STD_SENSOR_ATTRID_RANGES,
+//    SNS_STD_SENSOR_ATTRID_RATES attributes are not applicable since this is
+//    a single output sensor.
+// 3. See sns_std_sensor.proto for other attributes.
+
+
+// Handling stream requests:
+// 1. A message with ID SNS_STD_SENSOR_MSGID_SNS_STD_ON_CHANGE_CONFIG is an
+//    enable request to the activity sensor.
+// 2. A client deletes the data stream with activity Sensor to disable it's
+//    original enable request.
+
+// Message IDs for activity Sensor
+enum sns_activity_msgid {
+  option (nanopb_enumopt).long_names = false;
+
+  // The activity Sensor publishes an event with this message ID
+  SNS_ACTIVITY_MSGID_SNS_ACTIVITY_EVENT  = 778;
+}
+
+enum sns_inactivity_msgid {
+  option (nanopb_enumopt).long_names = false;
+
+  // The activity Sensor publishes an event with this message ID
+  SNS_INACTIVITY_MSGID_SNS_INACTIVITY_EVENT  = 779;
+}
+
+enum sns_activity_event_type {
+  option (nanopb_enumopt).long_names = false;
+
+  SNS_ACTIVITY_EVENT_TYPE_DISABLED = 0;
+  SNS_ACTIVITY_EVENT_TYPE_ENABLED  = 1;
+  SNS_ACTIVITY_EVENT_TYPE_FIRED    = 2;
+}
+
+enum sns_inactivity_event_type {
+  option (nanopb_enumopt).long_names = false;
+
+  SNS_INACTIVITY_EVENT_TYPE_DISABLED = 0;
+  SNS_INACTIVITY_EVENT_TYPE_ENABLED  = 1;
+  SNS_INACTIVITY_EVENT_TYPE_FIRED    = 2;
+}
+
+// Events types from activity Sensor
+message sns_activity_event
+{
+  required sns_activity_event_type activity_event_type = 1 [default = SNS_ACTIVITY_EVENT_TYPE_DISABLED];
+}
+// Events types from activity Sensor
+message sns_inactivity_event
+{
+  required sns_inactivity_event_type inactivity_event_type = 1 [default = SNS_INACTIVITY_EVENT_TYPE_DISABLED];
+}
+

@@ -1,0 +1,87 @@
+#===============================================================================
+#
+# BMI160 sensor implementation
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2016-2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#  $Id: //components/rel/ssc.slpi/3.0/sensors/bmi160/build/sns_bmi160.scons#3 $
+#  $DateTime: 2018/02/06 11:55:54 $
+#  $Change: 15403508 $
+#
+#===============================================================================
+Import('env')
+import os,inspect
+
+# To add island support for drivers:
+# 1. Refactor driver files to separate all island mode functions in a separate
+#    file(s) with filenames ending in "_island". See 80-P9361-1 for details.
+#    Example: sns_bmi160_hal_island.c
+# 2. Use a dedicated environment flag to check if island mode is enabled for the
+#    driver. Use format SNS_ISLAND_INCLUDE_<sensor_name>
+#    Example: SNS_ISLAND_INCLUDE_BMI160.
+# 3. Use this flag to decide whether add_island_files is set to True ot False
+#    when env.AddSSCSU() is called.
+# 4. Include the flag in build flag options (-f) to enable island mode for
+#    the driver.
+
+if ('SSC_TARGET_HEXAGON_MDSP' in env['CPPDEFINES']):
+  Return()
+
+bmi160_island_enable = False
+
+if 'SNS_ISLAND_INCLUDE_BMI160' in env:
+  bmi160_island_enable = True
+
+if 'SNS_DISABLE_REGISTRY' in env:
+  env.Append( CPPDEFINES = ['BMI160_ENABLE_REGISTRY=0'] )
+else:
+  env.Append( CPPDEFINES = ['BMI160_ENABLE_REGISTRY=1'] )
+
+if 'BMI160_ENABLE_DUAL_SENSOR' in env:
+  env.Append( CPPDEFINES = ['BMI160_ENABLE_DUAL_SENSOR'] )
+  num_copy = 2
+else:
+  num_copy = 1
+
+if 'SSC_INCLUDE_SENS_VEND_LIBS' in env and ('bmi160' in env['SSC_INCLUDE_SENS_VEND_LIBS']):
+  # HY11 builds - ship as source
+  clean_pack_list = []
+else:
+  # Delete the NPOR driver from pack builds
+  clean_pack_list = ['*']
+
+if 'SNS_GET_PARAMETER_FROM_SMEM' in env:
+  env.Append( CPPDEFINES = ['BMI160_GET_PARAMETER_FROM_SMEM'] )
+
+CBSP_API = [
+   'DAL',
+   'SYSTEMDRIVERS',
+   'SERVICES',
+   'DEBUGTOOLS',
+   'KERNEL',
+]
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  if ('SSC_TARGET_HEXAGON' in env['CPPDEFINES']) and ('SENSORS_DD_DEV_FLAG' not in env):
+    env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               flavor = ["hexagon"],
+               core_public_api = CBSP_API,
+               register_func_name = "sns_register_bmi160",
+               clean_pack_list = clean_pack_list,
+               binary_lib = False,
+               registration_cnt = num_copy,
+               add_island_files = bmi160_island_enable) 
+
+if 'SENSORS_DD_DEV_FLAG' in env:
+  ME = inspect.getfile(inspect.currentframe())
+  MY_ROOT = os.path.dirname(os.path.dirname(ME))
+  REMOVE_FILES = env.FindFiles(['*.*'], MY_ROOT)
+  env.CleanPack(env['SSC_BUILD_TAGS'], REMOVE_FILES)
+
+  

@@ -1,0 +1,56 @@
+#===============================================================================
+#
+# MMC5603NJ sensor implementation
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2017 by Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+#-------------------------------------------------------------------------------
+#
+#  $Id: //components/rel/ssc.slpi/5.0/sensors/mmc5603nj/build/sns_mmc5603nj.scons#13 $
+#  $DateTime: 2017/08/31 16:41:58 $
+#  $Change: 14077164 $
+#
+#===============================================================================
+Import('env')
+import inspect
+
+# To add island support for drivers:
+# 1. Refactor driver files to separate all island mode functions in a separate
+#    file(s) with filenames ending in "_island". See 80-P9361-1 for details.
+#    Example: sns_mmc5603nj_hal_island.c
+# 2. Use a dedicated environment flag to check if island mode is enabled for the
+#    driver. Use format SNS_ISLAND_INCLUDE_<sensor_name>
+#    Example: SNS_ISLAND_INCLUDE_MMC5603NJ.
+# 3. Use this flag to decide whether add_island_files is set to True ot False
+#    when env.AddSSCSU() is called.
+# 4. Include the flag in build flag options (-f) to enable island mode for
+#    the driver.
+
+mmc5603x_island_enable = False
+
+if 'SNS_ISLAND_INCLUDE_MMC5603NJ' in env:
+  mmc5603x_island_enable = True
+
+CBSP_API = [
+   'DAL',
+   'SYSTEMDRIVERS',
+   'SERVICES',
+   'DEBUGTOOLS',
+   'KERNEL',
+]
+if 'SNS_GET_PARAMETER_FROM_SMEM' in env:
+	env.Append( CPPDEFINES = ['MMC5603X_GET_PARAMETER_FROM_SMEM'])
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  if 'SSC_TARGET_HEXAGON' in env['CPPDEFINES']:
+    env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+               flavor = ["hexagon"],
+               core_public_api = CBSP_API,
+               register_func_name = "sns_register_mmc5603x",
+               binary_lib = False,
+               add_island_files = mmc5603x_island_enable)
+

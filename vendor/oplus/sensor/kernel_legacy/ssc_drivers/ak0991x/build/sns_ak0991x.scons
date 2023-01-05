@@ -1,0 +1,48 @@
+#===============================================================================
+#
+# AK0991X sensor implementation
+#
+# GENERAL DESCRIPTION
+#    build script
+#
+# Copyright (c) 2016-2018 by Qualcomm Technologies, Inc.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+# All Rights Reserved.
+#
+# Copyright (c) 2016-2018 by Asahi Kasei Microdevices
+# Confidential and Proprietary - Asahi Kasei Microdevices
+#
+#===============================================================================
+Import('env')
+import inspect
+
+ak0991x_island_enable = False
+
+if ('SSC_TARGET_HEXAGON_MDSP' in env['CPPDEFINES']):
+  Return()
+
+if 'SNS_ISLAND_INCLUDE_AK0991X' in env:
+  ak0991x_island_enable = True
+
+if 'SNS_DISABLE_REGISTRY' not in env:
+  env.Append( CPPDEFINES = ['AK0991X_ENABLE_REGISTRY_ACCESS'])
+
+if 'SNS_GET_PARAMETER_FROM_SMEM' in env:
+  env.Append( CPPDEFINES = ['AK0991X_GET_PARAMETER_FROM_SMEM'])
+
+if 'AK0991X_ENABLE_DUAL_SENSOR' in env:
+  env.Append( CPPDEFINES = ['AK0991X_ENABLE_DUAL_SENSOR'])
+  ak0991x_sensor_cnt = 2
+else:
+  ak0991x_sensor_cnt = 1
+   
+if 'USES_SSC_STATIC_LIB_BUILDER' in env:
+  if ('SSC_TARGET_HEXAGON' in env['CPPDEFINES']): 
+    env.AddSSCSU(inspect.getfile(inspect.currentframe()),
+                 register_func_name = "sns_register_ak0991x",
+                 core_public_api = ['SYSTEMDRIVERS'],
+                 binary_lib =False,
+                 cflags = ['-Wno-sign-compare'],
+                 add_island_files = ak0991x_island_enable,
+                 registration_cnt = ak0991x_sensor_cnt,
+                 diag_ssid = "MSG_SSID_SNS_SENSOR_EXT")
